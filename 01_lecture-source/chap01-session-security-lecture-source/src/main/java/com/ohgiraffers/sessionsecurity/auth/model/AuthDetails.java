@@ -4,6 +4,7 @@ import com.ohgiraffers.sessionsecurity.user.model.dto.LoginUserDTO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,7 +33,12 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+        loginUserDTO.getRole().forEach(role -> authorities.add(() -> role));
+
+        return authorities;
     }
 
     /* 필기.
@@ -41,7 +47,7 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public String getPassword() {
-        return "";
+        return loginUserDTO.getPassword();
     }
 
     /* 필기.
@@ -50,7 +56,7 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public String getUsername() {
-        return "";
+        return loginUserDTO.getUserName();
     }
 
     /* 필기.
@@ -58,7 +64,7 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     /* 필기.
@@ -68,7 +74,7 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     /* 필기.
@@ -76,7 +82,7 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     /* 필기.
@@ -85,6 +91,6 @@ public class AuthDetails implements UserDetails {
     *  */
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

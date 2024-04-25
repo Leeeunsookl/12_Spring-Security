@@ -1,10 +1,15 @@
 package com.ohgiraffers.sessionsecurity.config;
 
+import com.ohgiraffers.sessionsecurity.common.UserRole;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +28,25 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /* 필기.
+    *   정적인 리소스에 대한 요청을 제외하는 설정을 하는 bean
+    *  */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests( auth -> {
+            auth.requestMatchers("/auth/login", "/user/signup", "/auth/fail", "/", "/main").permitAll();
+            auth.requestMatchers("/admin/*").hasAnyAuthority(UserRole.ADMIN.getRole());
+            auth.requestMatchers("/user/*").hasAnyAuthority(UserRole.USER.getRole());
+            auth.anyRequest().authenticated();
+        })
     }
 
 }
